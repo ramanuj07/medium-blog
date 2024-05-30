@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
+const medium_common_1 = require("@ramanuj07/medium-common");
 const blogRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 blogRouter.use(express_1.default.json());
@@ -38,6 +39,12 @@ const authenticateToken = (req, res, next) => {
 };
 blogRouter.post("/", authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { title, content } = req.body;
+    const { success } = medium_common_1.createBlogInput.safeParse({ title, content });
+    if (!success) {
+        return res.status(411).json({
+            msg: "Incorrect inputs",
+        });
+    }
     try {
         if (!title || !content) {
             return res.status(400).json({ error: "Missing required fields" });
@@ -59,6 +66,12 @@ blogRouter.post("/", authenticateToken, (req, res) => __awaiter(void 0, void 0, 
 }));
 blogRouter.put("/", authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id, title, content } = req.body;
+    const { success } = medium_common_1.updateBlogInput.safeParse({ id, title, content });
+    if (!success) {
+        return res.status(411).json({
+            msg: "Incorrect inputs",
+        });
+    }
     if (!title || !content) {
         return res.status(400).json({ error: "Missing required fields" });
     }

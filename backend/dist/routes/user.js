@@ -16,11 +16,18 @@ const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const medium_common_1 = require("@ramanuj07/medium-common");
 const userRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 const secretKey = process.env.SECRET_KEY;
 userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
+    const { success } = medium_common_1.signupInput.safeParse({ email, password });
+    if (!success) {
+        return res.status(411).json({
+            msg: "Inputs not correct",
+        });
+    }
     try {
         const existingUser = yield prisma.user.findUnique({
             where: { email },
@@ -49,6 +56,12 @@ userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
 }));
 userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
+    const { success } = medium_common_1.signinInput.safeParse({ email, password });
+    if (!success) {
+        return res.status(411).json({
+            msg: "Incorrect inputs",
+        });
+    }
     try {
         const user = yield prisma.user.findUnique({
             where: { email },

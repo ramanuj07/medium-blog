@@ -2,6 +2,7 @@ import express from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { signupInput, signinInput } from "@ramanuj07/medium-common";
 
 const userRouter = express.Router();
 const prisma = new PrismaClient();
@@ -10,6 +11,13 @@ const secretKey = process.env.SECRET_KEY as string;
 
 userRouter.post("/signup", async (req, res) => {
   const { email, password } = req.body;
+  const { success } = signupInput.safeParse({ email, password });
+
+  if (!success) {
+    return res.status(411).json({
+      msg: "Inputs not correct",
+    });
+  }
 
   try {
     const existingUser = await prisma.user.findUnique({
@@ -44,6 +52,13 @@ userRouter.post("/signup", async (req, res) => {
 
 userRouter.post("/signin", async (req, res) => {
   const { email, password } = req.body;
+  const { success } = signinInput.safeParse({ email, password });
+
+  if (!success) {
+    return res.status(411).json({
+      msg: "Incorrect inputs",
+    });
+  }
 
   try {
     const user = await prisma.user.findUnique({

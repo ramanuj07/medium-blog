@@ -3,6 +3,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response, NextFunction } from "express";
+import { createBlogInput, updateBlogInput } from "@ramanuj07/medium-common";
 
 const blogRouter = express.Router();
 const prisma = new PrismaClient();
@@ -44,6 +45,14 @@ blogRouter.post(
   authenticateToken,
   async (req: AuthenticatedRequest, res: Response) => {
     const { title, content } = req.body;
+    const { success } = createBlogInput.safeParse({ title, content });
+
+    if (!success) {
+      return res.status(411).json({
+        msg: "Incorrect inputs",
+      });
+    }
+
     try {
       if (!title || !content) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -71,6 +80,13 @@ blogRouter.put(
   authenticateToken,
   async (req: AuthenticatedRequest, res: Response) => {
     const { id, title, content } = req.body;
+    const { success } = updateBlogInput.safeParse({ id, title, content });
+
+    if (!success) {
+      return res.status(411).json({
+        msg: "Incorrect inputs",
+      });
+    }
 
     if (!title || !content) {
       return res.status(400).json({ error: "Missing required fields" });

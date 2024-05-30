@@ -1,15 +1,33 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LabelledInput } from "./ui/LabelledInput";
 import { SignupInput } from "@ramanuj07/medium-common";
 import Button from "./ui/Button";
+import axios from "axios";
+import { BACKEND_URL } from "../config";
 
 const Auth = ({ type }: { type: "signup" | "signin" }) => {
   const [postInputs, setPostInputs] = useState<SignupInput>({
+    name: "",
     email: "",
     password: "",
-    name: "",
   });
+  const navigate = useNavigate();
+
+  const handleAuthClick = async () => {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`,
+        postInputs
+      );
+      console.log(response);
+      const jwt = response.data;
+      localStorage.setItem("token", jwt);
+      navigate("/blogs");
+    } catch (e) {
+      console.log("error");
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col justify-center">
@@ -72,7 +90,7 @@ const Auth = ({ type }: { type: "signup" | "signin" }) => {
             />
           </div>
 
-          <Button type={type} />
+          <Button type={type} onClick={handleAuthClick} />
         </div>
       </div>
     </div>

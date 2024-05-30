@@ -10,8 +10,8 @@ const prisma = new PrismaClient();
 const secretKey = process.env.SECRET_KEY as string;
 
 userRouter.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
-  const { success } = signupInput.safeParse({ email, password });
+  const { name, email, password } = req.body;
+  const { success } = signupInput.safeParse({ name, email, password });
 
   if (!success) {
     return res.status(411).json({
@@ -32,6 +32,7 @@ userRouter.post("/signup", async (req, res) => {
 
     const user = await prisma.user.create({
       data: {
+        name,
         email,
         password: hashedPassword,
       },

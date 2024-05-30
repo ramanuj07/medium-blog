@@ -21,8 +21,8 @@ const userRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 const secretKey = process.env.SECRET_KEY;
 userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    const { success } = medium_common_1.signupInput.safeParse({ email, password });
+    const { name, email, password } = req.body;
+    const { success } = medium_common_1.signupInput.safeParse({ name, email, password });
     if (!success) {
         return res.status(411).json({
             msg: "Inputs not correct",
@@ -38,6 +38,7 @@ userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
         const user = yield prisma.user.create({
             data: {
+                name,
                 email,
                 password: hashedPassword,
             },

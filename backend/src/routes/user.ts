@@ -42,10 +42,7 @@ userRouter.post("/signup", async (req, res) => {
       expiresIn: "1h",
     });
 
-    return res.status(201).json({
-      msg: "New user created",
-      token,
-    });
+    return res.status(201).json(token);
   } catch (e) {
     return res.status(500).json({ msg: "Internal server error" });
   }
@@ -84,10 +81,7 @@ userRouter.post("/signin", async (req, res) => {
       expiresIn: "1h",
     });
 
-    return res.status(200).json({
-      msg: "Sign-in successful",
-      token,
-    });
+    return res.status(200).json(token);
   } catch (e) {
     return res.status(500).json({
       msg: "Internal server error",

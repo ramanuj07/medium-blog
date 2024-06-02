@@ -97,7 +97,7 @@ blogRouter.put("/", authenticateToken, (req, res) => __awaiter(void 0, void 0, v
         id,
     });
 }));
-blogRouter.get("/bulk", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.get("/bulk", authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const blogs = yield prisma.post.findMany({
             select: {
@@ -118,7 +118,7 @@ blogRouter.get("/bulk", (req, res) => __awaiter(void 0, void 0, void 0, function
         return res.status(500).json({ error: "Internal Server Error" });
     }
 }));
-blogRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.get("/:id", authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         const blog = yield prisma.post.findFirst({

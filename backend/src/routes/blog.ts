@@ -120,54 +120,62 @@ blogRouter.put(
   }
 );
 
-blogRouter.get("/bulk", async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const blogs = await prisma.post.findMany({
-      select: {
-        title: true,
-        content: true,
-        id: true,
-        author: {
-          select: {
-            name: true,
+blogRouter.get(
+  "/bulk",
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const blogs = await prisma.post.findMany({
+        select: {
+          title: true,
+          content: true,
+          id: true,
+          author: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return res.json(blogs);
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-blogRouter.get("/:id", async (req: AuthenticatedRequest, res: Response) => {
-  const { id } = req.params;
-  try {
-    const blog = await prisma.post.findFirst({
-      where: { id: Number(id) },
-      select: {
-        title: true,
-        content: true,
-        id: true,
-        author: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-
-    if (!blog) {
-      return res.status(404).json({ error: "Post not found" });
+      return res.json(blogs);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
-
-    return res.status(200).json(blog);
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+);
+
+blogRouter.get(
+  "/:id",
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    try {
+      const blog = await prisma.post.findFirst({
+        where: { id: Number(id) },
+        select: {
+          title: true,
+          content: true,
+          id: true,
+          author: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!blog) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      return res.status(200).json(blog);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
 
 export default blogRouter;

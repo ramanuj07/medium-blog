@@ -46,10 +46,7 @@ userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         const token = jsonwebtoken_1.default.sign({ userId: user.id }, secretKey, {
             expiresIn: "1h",
         });
-        return res.status(201).json({
-            msg: "New user created",
-            token,
-        });
+        return res.status(201).json(token);
     }
     catch (e) {
         return res.status(500).json({ msg: "Internal server error" });
@@ -81,10 +78,7 @@ userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
         const token = jsonwebtoken_1.default.sign({ userId: user.id }, secretKey, {
             expiresIn: "1h",
         });
-        return res.status(200).json({
-            msg: "Sign-in successful",
-            token,
-        });
+        return res.status(200).json(token);
     }
     catch (e) {
         return res.status(500).json({

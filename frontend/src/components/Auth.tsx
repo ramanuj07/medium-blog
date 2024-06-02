@@ -23,8 +23,7 @@ const Auth = ({ type }: { type: "signup" | "signin" }) => {
         postInputs
       );
       const jwt = response.data;
-      console.log(jwt);
-      localStorage.setItem("token", JSON.stringify(jwt));
+      localStorage.setItem("token", jwt);
       navigate("/blogs");
     } catch (e) {
       console.log("error");

@@ -1,22 +1,28 @@
+import Appbar from "../components/Appbar";
 import BlogCard from "../components/BlogCard";
+import { useBlogs } from "../hooks/useBlogs";
 
 const Blogs = () => {
-  return (
-    <div className="flex justify-center">
-      <div className="max-w-xl">
-        <BlogCard
-          authorName="Ramanuj Jindal"
-          publishedDate="23-2-2222"
-          title="dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff"
-          content="jkcnfkjdsn dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff "
-        />
+  const { loading, blogs } = useBlogs();
 
-        <BlogCard
-          authorName="Ramanuj Jindal"
-          publishedDate="23-2-2222"
-          title="dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff"
-          content="jkcnfkjdsn dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff dscdsff "
-        />
+  if (loading) {
+    return <div>loading...</div>;
+  }
+  return (
+    <div>
+      <Appbar />
+      <div className="flex justify-center">
+        <div>
+          {blogs.map((blog) => (
+            <BlogCard
+              id={blog.id}
+              authorName={blog.author.name}
+              publishedDate="23-2-2222"
+              title={blog.title}
+              content={blog.content}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

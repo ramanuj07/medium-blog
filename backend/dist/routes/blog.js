@@ -24,8 +24,7 @@ blogRouter.use((0, cors_1.default)());
 const secretKey = process.env.SECRET_KEY;
 // Authentication middleware
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = req.headers["authorization"];
     if (!token) {
         return res.sendStatus(401); // Unauthorized
     }
@@ -98,9 +97,20 @@ blogRouter.put("/", authenticateToken, (req, res) => __awaiter(void 0, void 0, v
         id,
     });
 }));
-blogRouter.get("/bulk", authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.get("/bulk", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const blogs = yield prisma.post.findMany();
+        const blogs = yield prisma.post.findMany({
+            select: {
+                title: true,
+                content: true,
+                id: true,
+                author: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        });
         return res.json(blogs);
     }
     catch (e) {
@@ -108,11 +118,21 @@ blogRouter.get("/bulk", authenticateToken, (req, res) => __awaiter(void 0, void 
         return res.status(500).json({ error: "Internal Server Error" });
     }
 }));
-blogRouter.get("/:id", authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
         const blog = yield prisma.post.findFirst({
             where: { id: Number(id) },
+            select: {
+                title: true,
+                content: true,
+                id: true,
+                author: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
         });
         if (!blog) {
             return res.status(404).json({ error: "Post not found" });

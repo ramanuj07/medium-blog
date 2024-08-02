@@ -11,22 +11,30 @@ interface BlogInterface {
   };
 }
 
-export const useBlog = ({ id }: { id: string }) => {
-  const [loading, setLoading] = useState(true);
-  const [blog, setBlog] = useState<BlogInterface>();
+export const useBlog = ({
+  id,
+  initialData,
+}: {
+  id: string;
+  initialData?: BlogInterface;
+}) => {
+  const [loading, setLoading] = useState(!initialData);
+  const [blog, setBlog] = useState<BlogInterface | undefined>(initialData);
 
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/api/v1/blog/${id}`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      })
-      .then((res) => {
-        setBlog(res.data);
-        setLoading(false);
-      });
-  }, [id]);
+    if (!initialData) {
+      axios
+        .get(`${BACKEND_URL}/api/v1/blog/${id}`, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        })
+        .then((res) => {
+          setBlog(res.data);
+          setLoading(false);
+        });
+    }
+  }, [id, initialData]);
 
   return {
     blog,

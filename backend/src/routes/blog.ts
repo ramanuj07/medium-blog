@@ -18,7 +18,6 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Authentication middleware
-
 const authenticateToken = (
   req: AuthenticatedRequest,
   res: Response,
@@ -146,36 +145,69 @@ blogRouter.get(
   }
 );
 
-blogRouter.get(
-  "/:id",
-  authenticateToken,
-  async (req: AuthenticatedRequest, res: Response) => {
-    const { id } = req.params;
-    try {
-      const blog = await prisma.post.findFirst({
-        where: { id: Number(id) },
-        select: {
-          title: true,
-          content: true,
-          id: true,
-          author: {
-            select: {
-              name: true,
-            },
+blogRouter.get("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const blog = await prisma.post.findFirst({
+      where: { id: Number(id) },
+      select: {
+        title: true,
+        content: true,
+        id: true,
+        author: {
+          select: {
+            name: true,
           },
         },
-      });
+      },
+    });
 
-      if (!blog) {
-        return res.status(404).json({ error: "Post not found" });
-      }
-
-      return res.status(200).json(blog);
-    } catch (e) {
-      console.error(e);
-      return res.status(500).json({ error: "Internal Server Error" });
+    if (!blog) {
+      return res.status(404).json({ error: "Post not found" });
     }
+
+    const isBot = /bot|crawler|spider|crawling/i.test(
+      req.get("user-agent") || ""
+    );
+
+    if (isBot) {
+      const metaTags = `
+        <title>${blog.title}</title>
+        <meta name="description" content="${blog.content.substring(0, 160)}">
+        <meta property="og:title" content="${blog.title}">
+        <meta property="og:description" content="${blog.content.substring(
+          0,
+          160
+        )}">
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="https://yourdomain.com/blog/${
+          blog.id
+        }">
+        <meta property="og:image" content="https://yourdomain.com/default-image.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+      `;
+
+      const html = `
+        <!doctype html>
+        <html>
+          <head>
+            ${metaTags}
+          </head>
+          <body>
+            <h1>${blog.title}</h1>
+            <p>${blog.content}</p>
+          </body>
+        </html>
+      `;
+
+      return res.send(html);
+    } else {
+      return res.status(200).json(blog);
+    }
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
-);
+});
 
 export default blogRouter;
